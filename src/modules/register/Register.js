@@ -1,73 +1,71 @@
 import React, {useState} from 'react';
 import {Link, useHistory} from 'react-router-dom';
-import {toast} from 'react-toastify';
 import {connect} from 'react-redux';
+import {toast} from 'react-toastify';
 import {useFormik} from 'formik';
 import {useTranslation} from 'react-i18next';
-
 import * as Yup from 'yup';
 
+import {Button} from '@components';
 import * as AuthService from '../../services/auth';
-import Button from '../../components/button/Button';
 import * as ActionTypes from '../../store/actions';
 
-const Login = ({onUserLogin}) => {
+const Register = ({onUserLogin}) => {
     const [isAuthLoading, setAuthLoading] = useState(false);
     const [isGoogleAuthLoading, setGoogleAuthLoading] = useState(false);
     const [isFacebookAuthLoading, setFacebookAuthLoading] = useState(false);
-
-    const history = useHistory();
     const [t] = useTranslation();
 
-    const login = (email, password) => {
+    const history = useHistory();
+
+    const register = (email, password) => {
         setAuthLoading(true);
-        AuthService.loginByAuth(email, password)
+        AuthService.registerByAuth(email, password)
             .then((token) => {
-                toast.success('Login is succeed!');
                 setAuthLoading(false);
                 onUserLogin(token);
+                toast.success('Registration is success');
                 history.push('/');
             })
             .catch((error) => {
-                setAuthLoading(false);
                 toast.error(
                     (error.response &&
                         error.response.data &&
                         error.response.data.message) ||
                         'Failed'
                 );
+                setAuthLoading(false);
             });
     };
 
     const loginByGoogle = () => {
         setGoogleAuthLoading(true);
-        AuthService.loginByGoogle()
+        AuthService.registerByGoogle()
             .then((token) => {
-                toast.success('Login is succeeded!');
                 setGoogleAuthLoading(false);
                 onUserLogin(token);
+                toast.success('Authentication is succeed!');
                 history.push('/');
             })
             .catch((error) => {
-                setGoogleAuthLoading(false);
                 toast.error(
                     (error.response &&
                         error.response.data &&
                         error.response.data.message) ||
                         'Failed'
                 );
+                setGoogleAuthLoading(false);
             });
     };
 
     const loginByFacebook = () => {
         setFacebookAuthLoading(true);
 
-        AuthService.loginByFacebook()
+        AuthService.registerByFacebook()
             .then((token) => {
-                toast.success('Login is succeeded!');
                 setFacebookAuthLoading(false);
                 onUserLogin(token);
-
+                toast.success('Register is succeeded!');
                 history.push('/');
             })
             .catch((error) => {
@@ -84,7 +82,8 @@ const Login = ({onUserLogin}) => {
     const formik = useFormik({
         initialValues: {
             email: '',
-            password: ''
+            password: '',
+            passwordRetype: ''
         },
         validationSchema: Yup.object({
             email: Yup.string()
@@ -93,17 +92,28 @@ const Login = ({onUserLogin}) => {
             password: Yup.string()
                 .min(5, 'Must be 5 characters or more')
                 .max(30, 'Must be 30 characters or less')
+                .required('Required'),
+            passwordRetype: Yup.string()
+                .min(5, 'Must be 5 characters or more')
+                .max(30, 'Must be 30 characters or less')
                 .required('Required')
+                .when('password', {
+                    is: (val) => !!(val && val.length > 0),
+                    then: Yup.string().oneOf(
+                        [Yup.ref('password')],
+                        'Both password need to be the same'
+                    )
+                })
         }),
         onSubmit: (values) => {
-            login(values.email, values.password);
+            register(values.email, values.password);
         }
     });
 
-    document.getElementById('root').classList = 'hold-transition login-page';
+    document.getElementById('root').classList = 'hold-transition register-page';
 
     return (
-        <div className="login-box">
+        <div className="register-box">
             <div className="card card-outline card-primary">
                 <div className="card-header text-center">
                     <Link to="/" className="h1">
@@ -112,7 +122,7 @@ const Login = ({onUserLogin}) => {
                     </Link>
                 </div>
                 <div className="card-body">
-                    <p className="login-box-msg">{t('login.label.signIn')}</p>
+                    <p className="login-box-msg">{t('register.registerNew')}</p>
                     <form onSubmit={formik.handleSubmit}>
                         <div className="mb-3">
                             <div className="input-group">
@@ -152,31 +162,56 @@ const Login = ({onUserLogin}) => {
                             ) : null}
                         </div>
 
+                        <div className="mb-3">
+                            <div className="input-group">
+                                <input
+                                    type="password"
+                                    className="form-control"
+                                    placeholder="Retype password"
+                                    {...formik.getFieldProps('passwordRetype')}
+                                />
+                                <div className="input-group-append">
+                                    <div className="input-group-text">
+                                        <span className="fas fa-lock" />
+                                    </div>
+                                </div>
+                            </div>
+                            {formik.touched.passwordRetype &&
+                            formik.errors.passwordRetype ? (
+                                <div>{formik.errors.passwordRetype}</div>
+                            ) : null}
+                        </div>
                         <div className="row">
                             <div className="col-8">
                                 <div className="icheck-primary">
-                                    <input type="checkbox" id="remember" />
-                                    <label htmlFor="remember">
-                                        {t('login.label.rememberMe')}
+                                    <input
+                                        type="checkbox"
+                                        id="agreeTerms"
+                                        name="terms"
+                                        defaultValue="agree"
+                                    />
+                                    <label htmlFor="agreeTerms">
+                                        <span>I agree to the </span>
+                                        <Link to="/">terms</Link>
                                     </label>
                                 </div>
                             </div>
                             <div className="col-4">
                                 <Button
-                                    block
                                     type="submit"
+                                    block
                                     isLoading={isAuthLoading}
                                     disabled={
                                         isFacebookAuthLoading ||
                                         isGoogleAuthLoading
                                     }
                                 >
-                                    {t('login.button.signIn.label')}
+                                    {t('register.label')}
                                 </Button>
                             </div>
                         </div>
                     </form>
-                    <div className="social-auth-links text-center mt-2 mb-3">
+                    <div className="social-auth-links text-center">
                         <Button
                             block
                             icon="facebook"
@@ -199,16 +234,9 @@ const Login = ({onUserLogin}) => {
                             {t('login.button.signIn.social', {what: 'Google'})}
                         </Button>
                     </div>
-                    <p className="mb-1">
-                        <Link to="/forgot-password">
-                            {t('login.label.forgotPass')}
-                        </Link>
-                    </p>
-                    <p className="mb-0">
-                        <Link to="/register" className="text-center">
-                            {t('login.label.registerNew')}
-                        </Link>
-                    </p>
+                    <Link to="/login" className="text-center">
+                        {t('register.alreadyHave')}
+                    </Link>
                 </div>
             </div>
         </div>
@@ -219,4 +247,4 @@ const mapDispatchToProps = (dispatch) => ({
     onUserLogin: (token) => dispatch({type: ActionTypes.LOGIN_USER, token})
 });
 
-export default connect(null, mapDispatchToProps)(Login);
+export default connect(null, mapDispatchToProps)(Register);

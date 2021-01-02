@@ -1,9 +1,7 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import Post from './Post';
 
-const ActivityTab = (props) => {
-    const {isActive} = props;
+const ActivityTab = ({isActive}) => {
     return (
         <div className={`tab-pane ${isActive ? 'active' : ''}`}>
             <Post />
@@ -11,14 +9,6 @@ const ActivityTab = (props) => {
             <Post />
         </div>
     );
-};
-
-ActivityTab.propTypes = {
-    isActive: PropTypes.bool
-};
-
-ActivityTab.defaultProps = {
-    isActive: false
 };
 
 export default ActivityTab;

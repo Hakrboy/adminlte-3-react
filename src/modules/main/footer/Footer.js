@@ -13,18 +13,18 @@ const Footer = () => {
                 <span>{version}</span>
             </div>
             <strong>
-                <span>Copyright © 2019-2020 </span>
+                <span>Copyright © 2020-2021 </span>
                 <a
-                    href="http://adminlte.io"
+                    href="https://adminlte.io"
                     target="_blank"
                     rel="noopener noreferrer"
                 >
-                    AdminLTE.io
+                    Anushre Sarees Pvt. Ltd.
                 </a>
-                <span>.</span>
+                <span> Powered by AdminLTE.io</span>
             </strong>
             <span> </span>
-            <span>{t('footer.copyright')}</span>
+            <span> </span>
         </footer>
     );
 };

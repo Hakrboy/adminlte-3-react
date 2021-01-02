@@ -1,11 +1,8 @@
 import React from 'react';
 import {Redirect, Route} from 'react-router-dom';
 import {connect} from 'react-redux';
-import PropTypes from 'prop-types';
 
-const PrivateRoute = (props) => {
-    const {children, isLoggedIn, ...rest} = props;
-
+const PrivateRoute = ({children, isLoggedIn, ...rest}) => {
     return (
         <Route
             {...rest}
@@ -23,18 +20,6 @@ const PrivateRoute = (props) => {
             }
         />
     );
-};
-
-PrivateRoute.propTypes = {
-    children: PropTypes.oneOfType([
-        PropTypes.arrayOf(PropTypes.node),
-        PropTypes.node
-    ]),
-    isLoggedIn: PropTypes.bool.isRequired
-};
-
-PrivateRoute.defaultProps = {
-    children: null
 };
 
 const mapStateToProps = (state) => ({

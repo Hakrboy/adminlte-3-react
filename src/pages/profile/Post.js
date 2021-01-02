@@ -1,9 +1,7 @@
 import React from 'react';
 import {Link} from 'react-router-dom';
-import PropTypes from 'prop-types';
 
-const Post = (props) => {
-    const {isClearfix} = props;
+const Post = ({isClearfix}) => {
     return (
         <div className={`post ${isClearfix ? 'clearfix' : ''}`}>
             <div className="user-block">
@@ -62,14 +60,6 @@ const Post = (props) => {
             </form>
         </div>
     );
-};
-
-Post.propTypes = {
-    isClearfix: PropTypes.bool
-};
-
-Post.defaultProps = {
-    isClearfix: false
 };
 
 export default Post;
